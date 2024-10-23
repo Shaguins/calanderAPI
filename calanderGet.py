@@ -13,6 +13,7 @@ SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"]
 startList = []
 endList = []
 summaryList = []
+spreadSheetID = "17ytMl_Z9XLYz1EJpNJ-rSaygH01i4ejUnSsLYWDHeNM"
 def calanderGetting (service):
       # Call the Calendar API
     now = datetime.datetime.now().isoformat() + "Z"  # 'Z' indicates UTC time
@@ -44,6 +45,27 @@ def calanderGetting (service):
       print(start, end, event["summary"])
       summaryList.append(event["summary"])
     return startList, endList, summaryList      
+  
+def sheetsWrite(service, spreadsheetID, rangeName, valueInputOption, _values):
+  values = [
+    [
+              # Cell values ...
+      ],
+          # Additional rows
+  ]
+  data = [
+    {"range": range_name, "values": values},
+          # Additional ranges to update ...
+  ]
+  body = {"valueInputOption": value_input_option, "data": data}
+  result = (
+    service.spreadsheets()
+    .values()
+    .batchUpdate(spreadsheetId=spreadsheet_id, body=body)
+    .execute()
+    )
+  print(f"{(result.get('totalUpdatedCells'))} cells updated.")
+  return result
 
 
 def main():

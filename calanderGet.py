@@ -9,7 +9,7 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 # If modifying these scopes, delete the file token.json.
-SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"]
+SCOPES = ["https://www.googleapis.com/auth/calendar.readonly","https://www.googleapis.com/auth/spreadsheets"]
 startList = []
 endList = []
 summaryList = []
@@ -47,21 +47,29 @@ def calanderGetting (service):
     return startList, endList, summaryList      
   
 def sheetsWrite(service, spreadsheetID, rangeName, valueInputOption, _values):
+  # #print(_values+ "len : " +len(_values)+ " len 2 : "+ len(_values[0]))
+  # print("len")
+  # print(len(_values))
+  # print("len2 : ")
+  # print(_values[0])  
   values = [
-    [
-              # Cell values ...
-      ],
-          # Additional rows
-  ]
+    [_values[0],_values[2]],[_values[1]],
+]
+  values2 = [[] for i in range(len(_values[0]))]
+  for row in range(0, len(_values[0])):
+    for column in range(0, len(_values)):
+      print("row"+str(row)+ str(len(_values[0])))
+      values2[row].append(_values[column][row])
+  print(values2)
   data = [
-    {"range": range_name, "values": values},
+    {"range": rangeName, "values": values2},
           # Additional ranges to update ...
   ]
-  body = {"valueInputOption": value_input_option, "data": data}
+  body = {"valueInputOption": valueInputOption, "data": data}
   result = (
     service.spreadsheets()
     .values()
-    .batchUpdate(spreadsheetId=spreadsheet_id, body=body)
+    .batchUpdate(spreadsheetId=spreadsheetID, body=body)
     .execute()
     )
   print(f"{(result.get('totalUpdatedCells'))} cells updated.")
@@ -97,7 +105,7 @@ def main():
     calanderService = build("calendar", "v3", credentials=creds)
     sheetsService = build("sheets", "v4", credentials=creds)
     
-    calanderGetting(calanderService)
+    sheetsWrite(sheetsService, spreadSheetID, "A1:G10","USER_ENTERED",calanderGetting(calanderService))
     
     
   except HttpError as error:
